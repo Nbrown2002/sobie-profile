@@ -41,7 +41,16 @@ async function run() {
 }
 run().catch(console.dir);
 
+async function getData() { 
+  await client.connection(); 
+  await client.db("admin").command({ ping: 1 });
 
+  let collection = await db.collection(); 
+  let results = await collection.find({})
+    .limit(50)
+    .toArray(); 
+  res.send(results).status(200); 
+}
 
 
 
@@ -67,7 +76,14 @@ app.get('/saveMyNameGet', (req,res)=> {
   let reqName
 })
 
-
+async function getData() 
+app.get('/read', function (req, res) { 
+  let getDataResults = await getData(); 
+  console.log(getDataResults); 
+  res.send(getDataResults); 
+  res.render('songs', {getDataResults})
+}
+)
 
 app.get('/ejs', function(req, res){
   res.render('word', 
