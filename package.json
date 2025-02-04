@@ -5,7 +5,9 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "mongodb": "^6.12.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "sha.js": "^2.4.11",
+    "sha256": "^0.2.0"
   },
   "name": "sobie-profile",
   "version": "1.0.0",

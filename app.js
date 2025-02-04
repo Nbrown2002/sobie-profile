@@ -1,8 +1,10 @@
 const express = require('express')
 require('dotenv').config()
 const app = express()
+const shajs = require('sha.js')
 const port = process.env.PORT || 3000
 const bodyParser = require('body-parser')
+const {MongoClient, ServerApiVersion } = require('mongodb'); 
 const uri = process.env.MONGO_URI; 
 
 console.log(uri);
@@ -13,9 +15,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + '/public'))
 
 
-// begin all my middlewere 
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -26,6 +25,10 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+
+console.log(shajs('sha256').update('cat').digest('hex')); 
+
 
 async function run() {
   try {
@@ -39,20 +42,45 @@ async function run() {
     await client.close();
   }
 }
-run().catch(console.dir);
 
-async function getData() { 
-  await client.connection(); 
-  await client.db("admin").command({ ping: 1 });
 
-  let collection = await db.collection(); 
-  let results = await collection.find({})
-    .limit(50)
-    .toArray(); 
-  res.send(results).status(200); 
+// run().catch(console.dir);
+
+// async function getData() { 
+//   await client.connect(); 
+//   let collection = await client.db("guitar-app-database").collection("guitar-app-songs"); 
+//   let results = await collection.find({}).toArray(); 
+//   console.log(results);   
+//   return results; 
+//   //.limit(50)
+//     //.toArray(); 
+//   //res.send(results).status(200); 
+// }
+
+async function getData() {
+
+  await client.connect();
+  console.log('connected') ;
+  // let collection = client.db("guitar-app-database").collection("guitar-app-songs"); 
+  let collection = client.db("guitar-app-database").collection("something"); 
+  console.log('collected') ;
+
+  let results = await collection.find({}).toArray(); 
+    
+  console.log("in getData() results: ", results); 
+  return results; 
+
 }
 
+// getData();
 
+app.get('/read', async function (req, res) {
+  let getDataResults = await getData(); 
+  console.log("here", getDataResults); 
+  res.render('songs', 
+    { songData : getDataResults} ); 
+
+})
 
 app.get('/', function (req, res) {
   res.sendFile('index.html');
@@ -63,9 +91,8 @@ app.get('/', function (req, res) {
   
 app.post('/saveMyName', (req,res)=> { 
   console.log('did we hit the get endpoint?'); 
-  console.log('req.query: ', req.body);
-
-  res.render('word', 
+  console.log(req.body);
+  res.render('words', 
   {pageTitle: req.body.myname})
   // let reqName
 })
@@ -73,35 +100,39 @@ app.post('/saveMyName', (req,res)=> {
 app.get('/saveMyNameGet', (req,res)=> { 
   console.log('did we hit the get endpoint?'); 
   console.log('req.query: ', req.query);
-  let reqName
+  let reqName = req.query.myNameGet; 
+  res.render('words', 
+    {pageTitle: reqName});   
 })
 
-async function getData() 
-app.get('/read', function (req, res) { 
+
+app.get('/read', async function (req, res) { 
   let getDataResults = await getData(); 
   console.log(getDataResults); 
   res.send(getDataResults); 
   res.render('songs', {getDataResults})
-}
+})
+
+app.get('/ejs', 
+  function(req, res) 
+  {
+  res.render('word', 
+    {pageTitle: 'my page title'}
+  )
+  }
 )
 
-app.get('/ejs', function(req, res){
-  res.render('word', 
-  {pageTitle: "my page title"})
-
-});
-
 app.get('/nodemon', function (req, res) {
-  res.send('im in nodemon')
+  res.send('im in nodemon'); 
 })
 
 app.get ('/helloRender', function (req, res) { 
-  res.send('Hello Express from the Real World <br><a href="/">Back to Home</a>')
-});
+  res.send('Hello Express from the Real World<br><a href="/">Back to Home</a>')
+})
 
-app.listen(  
-  port,
-  ()=> console.log( 
-    `server is running on... localhost:${port}`
-  )
-)
+app.listen(
+  port, 
+  ()=> console.log(
+    `server is running on ... localhost:${port}`
+    )
+  );
