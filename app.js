@@ -130,9 +130,35 @@ app.get ('/helloRender', function (req, res) {
   res.send('Hello Express from the Real World<br><a href="/">Back to Home</a>')
 })
 
-app.listen(
+/*app.listen(
   port, 
   ()=> console.log(
     `server is running on ... localhost:${port}`
     )
   );
+*/ 
+
+// Problem with Insert // 
+  app.get('/insert', async (req,res)=> {
+
+    console.log('in /insert');
+    
+    let newSong = req.query.Myname; 
+
+    //connect to db,
+    await client.connect();
+    //point to the collection 
+    await client
+      .db("guitar-app-database")
+      .collection("something")
+      .insertOne({ whatthewhatever : "newSong 1"});
+    res.redirect('/');
+
+  }); 
+
+  app.listen(
+    port, 
+    ()=> console.log(
+      `server is running on ... localhost:${port}`
+      )
+    );
