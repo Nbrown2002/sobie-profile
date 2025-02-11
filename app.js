@@ -46,7 +46,7 @@ async function run() {
 
 // run().catch(console.dir);
 
-// async function getData() { 
+//async function getData() { 
 //   await client.connect(); 
 //   let collection = await client.db("guitar-app-database").collection("guitar-app-songs"); 
 //   let results = await collection.find({}).toArray(); 
@@ -60,15 +60,15 @@ async function run() {
 async function getData() {
 
   await client.connect();
-  console.log('connected') ;
+  console.log('connected');
   // let collection = client.db("guitar-app-database").collection("guitar-app-songs"); 
-  let collection = client.db("guitar-app-database").collection("something"); 
-  console.log('collected') ;
+  let collection = client.db("nbsobie-profiledb").collection("nb-sobie-profile");
+  console.log('collected');
 
-  let results = await collection.find({}).toArray(); 
-    
-  console.log("in getData() results: ", results); 
-  return results; 
+  let results = await collection.find({}).toArray();
+
+  console.log("in getData() results: ", results);
+  return results;
 
 }
 
@@ -77,10 +77,30 @@ async function getData() {
 app.get('/read', async function (req, res) {
   let getDataResults = await getData(); 
   console.log("here", getDataResults); 
-  res.render('songs', 
-    { songData : getDataResults} ); 
+  res.render('hobbies', 
+    { hobbyData : getDataResults} ); 
 
 })
+
+app.post('/delete/:id', async (req,res)=>{
+
+  console.log("in delete, req.parms.id: ", req.params.id)
+
+  client.connect; 
+  const collection = client.db("nbsobie-profiledb")
+  .collection("nb-sobie-profile");
+  let result = await collection.findOneAndDelete( 
+    {
+      "_id": new ObjectId(req.params.id)
+    }
+  ).then(result => {
+  console.log(result); 
+  res.redirect('/read');})
+
+  
+
+})
+
 
 app.get('/', function (req, res) {
   res.sendFile('index.html');
@@ -110,7 +130,8 @@ app.get('/read', async function (req, res) {
   let getDataResults = await getData(); 
   console.log(getDataResults); 
   res.send(getDataResults); 
-  res.render('songs', {getDataResults})
+  res.render('hobbies', 
+    { hobbyData : getDataResults})
 })
 
 app.get('/ejs', 
@@ -139,22 +160,37 @@ app.get ('/helloRender', function (req, res) {
 */ 
 
 // Problem with Insert // 
-  app.get('/insert', async (req,res)=> {
-
+  app.post('/insert', async (req,res)=> {
     console.log('in /insert');
-    
-    let newSong = req.query.Myname; 
-
+    let newhobby = req.query.Myname; 
+    console.log('in /insert'); 
     //connect to db,
     await client.connect();
     //point to the collection 
     await client
-      .db("guitar-app-database")
-      .collection("something")
-      .insertOne({ whatthewhatever : "newSong 1"});
+      .db("nbsobie-profiledb")
+      .collection("nb-sobie-profile")
+      .insertOne({ whatthewhatever : "newhobby 1"});
     res.redirect('/');
 
   }); 
+
+  app.post('/update', async (req,res)=>{
+
+    console.log("req.body: ", req.body)
+  
+    client.connect; 
+    const collection = client.db("nbsobie-profiledb")
+    .collection("nb-sobie-profile");
+    let result = await collection.findOneAndUpdate( 
+    {"_id": new ObjectId(req.body.nameID)}, { $set: {"fname": req.body.inputUpdateName } }
+  )
+  .then(result => {
+    console.log(result); 
+    res.redirect('/read');
+  }) 
+  });
+
 
   app.listen(
     port, 
