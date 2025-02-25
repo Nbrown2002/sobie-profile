@@ -5,10 +5,10 @@ const shajs = require('sha.js')
 const port = process.env.PORT || 3000
 const bodyParser = require('body-parser')
 const { ObjectId } = require('mongodb')
-const {MongoClient, ServerApiVersion } = require('mongodb'); 
-const uri = process.env.MONGO_URI; 
-app.set('view engine', 'ejs'); 
-app.use(bodyParser.urlencoded({extended: true})); 
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = process.env.MONGO_URI;
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'))
 
 
@@ -23,58 +23,57 @@ const client = new MongoClient(uri, {
   }
 });
 
-const mongoCollection = client.db("nbsobie-profiledb").collection("nb-sobie-profile"); 
+const mongoCollection = client.db("nbsobie-profiledb").collection("nb-sobie-profile");
 
-function  initProfileData() { 
+function initProfileData() {
   mongoCollection.insertOne({
-    title: "this is blog title",  
+    title: "this is blog title",
     post: "this is the post"
   });
 }
 
 app.get('/', async function (req, res) {
-  
-  let results = await mongoCollection.find({}).toArray(); 
+
+  let results = await mongoCollection.find({}).toArray();
   res.render('profile',
-    {profileData  : results} );
+    { profileData: results });
 })
 
-app.post('/insert', async (req,res)=> {
-  let results = await mongoCollection.insertOne({ 
+app.post('/insert', async (req, res) => {
+  let results = await mongoCollection.insertOne({
     title: req.body.title,
     post: req.body.post,
   });
-  res.redirect('/'); 
-}); 
+  res.redirect('/');
+});
 
 
 app.post('/delete', async function (req, res) {
-  let result = await mongoCollection.findOneAndDelete( 
+  let result = await mongoCollection.findOneAndDelete(
     {
       "_id": new ObjectId(req.body.deleteId)
     }
-  ).then(result => { 
-    res.redirect('/'); 
+  ).then(result => {
+    res.redirect('/');
   })
 
-}); 
+});
 
-app.post('/update', async (req,res)=>{
-  let result = await mongoCollection.findOneAndUpdate( 
-  {_id: ObjectId.createFromHexString(req.body.updateId)}, { 
-    $set: 
-      {
-        title : req.body.updateTitle, 
-        post : req.body.updatePost 
-      }
-     }
+app.post('/update', async (req, res) => {
+  let result = await mongoCollection.findOneAndUpdate(
+    { _id: ObjectId.createFromHexString(req.body.updateId) }, {
+    $set:
+    {
+      title: req.body.updateTitle,
+      post: req.body.updatePost
+    }
+  }
   ).then(result => {
-  console.log(result); 
-  res.redirect('/');
-})
-}); 
+    console.log(result);
+    res.redirect('/');
+  })
+});
 
 
-app.listen(port, ()=> console.log(`server is running on ... localhost:${port}`) );
+app.listen(port, () => console.log(`server is running on ... localhost:${port}`));
 
- 
