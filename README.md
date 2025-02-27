@@ -1,7 +1,10 @@
 # Noah Brown's Sobie Profile #
 Created By Noah Brown 
+<br> 
 Project Assignment Due: 2/27/2025 11:59 PM CST
-Class: CIS-486-01 
+<br> 
+Class: CIS-486-01
+<br> 
 Facilitator: Dr. Barry Cumbie
 
 ## Purpose ##
