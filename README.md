@@ -1,6 +1,8 @@
 # Noah Brown's Sobie Profile #
 Created By Noah Brown 
-Utilizing MongoDB, Render, Github, and Visual Studio Code.  
+Project Assignment Due: 2/27/2025 11:59 PM CST
+Class: CIS-486-01 
+Facilitator: Dr. Barry Cumbie
 
 ## Purpose ##
 The creation of this profile is to display a personal
